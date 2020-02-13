@@ -216,6 +216,22 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   if (typeof appScriptUrl !== 'string') {
     throw new Error('invalid e2eSetContent() app script url');
   }
+  body.push(`<script>
+
+  window.onerror = function (msg, url, lineNo, columnNo, error) {
+    console.log('window onerror!', msg, url, lineNo, columnNo, error, document.body.outerHTML);
+    return false;
+  }
+
+  window.onabort = function() {
+    console.log('onabort', document.body.outerHTML);
+  }
+
+  window.addEventListener('load', function() {
+    console.log('window load', document.body.outerHTML);
+  });
+
+  </script>`);
   body.push(`<script type="module" src="${appScriptUrl}"></script>`);
 
   const appStyleUrl = env.__STENCIL_APP_STYLE_URL__;
