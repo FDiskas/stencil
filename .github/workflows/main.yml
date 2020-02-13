@@ -29,8 +29,8 @@ jobs:
       # - name: Test dist
       #   run: npm run test.dist
 
-      - name: Test testing suite
-        run: npm run test.testing
+      # - name: Test testing suite
+      #   run: npm run test.testing
 
       # - name: Test jest
       #   run: npm run test.jest

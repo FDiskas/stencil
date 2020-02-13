@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "start": "npm run watch",
-    "build": "node scripts && npm run tsc && npm run rollup.prod.ci",
+    "build": "node scripts && npm run tsc && npm run rollup",
     "build.prod": "node scripts && npm run tsc.scripts && npm run tsc && npm run rollup.prod",
     "tsc.scripts": "tsc -p scripts/tsconfig.json",
     "watch": "node scripts && npm run tsc && concurrently \"npm run rollup.watch\" \"npm run tsc.watch\"",
