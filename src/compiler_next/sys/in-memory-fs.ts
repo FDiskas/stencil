@@ -371,6 +371,13 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     item.queueDeleteFromDisk = false;
 
     results.changedContent = (item.fileText !== content);
+
+    if (results.changedContent && isString(item.fileText)) {
+      // check again by trimming the ending since this may only be the
+      // difference of windows ending with CRLF and Unix ending in LF
+      results.changedContent = (item.fileText.trimRight() !== content.trimRight());
+    }
+
     results.queuedWrite = false;
 
     item.fileText = content;
@@ -513,7 +520,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
         dirsAdded.push(dirPath);
 
-      } catch (e) {}
+      } catch (e) { }
     }
 
     return dirsAdded;
@@ -571,7 +578,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     for (const dirPath of dirsToDelete) {
       try {
         await sys.rmdir(dirPath);
-      } catch (e) {}
+      } catch (e) { }
       dirsDeleted.push(dirPath);
     }
 
