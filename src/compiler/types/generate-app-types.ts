@@ -23,15 +23,16 @@ export const generateAppTypes = async (config: d.Config, compilerCtx: d.Compiler
     componentTypesFileContent = updateStencilTypesImports(config.sys.path, destination, componentsDtsFilePath, componentTypesFileContent);
   }
 
-  const { changedContent } = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
+  const writeResults = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
+  const hasComponentsDtsChanged = writeResults.changedContent;
 
   const componentsDtsRelFileName = config.sys.path.relative(config.rootDir, componentsDtsFilePath);
-  if (changedContent) {
-    config.logger.debug(`generateAppTypes: ${componentsDtsRelFileName} changed`);
+  if (hasComponentsDtsChanged) {
+    config.logger.debug(`generateAppTypes: ${componentsDtsRelFileName} has changed`);
   }
 
   timespan.finish(`generated app types finished: ${componentsDtsRelFileName}`);
-  return changedContent;
+  return hasComponentsDtsChanged;
 };
 
 
