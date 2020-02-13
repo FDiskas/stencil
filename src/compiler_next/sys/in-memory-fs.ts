@@ -413,7 +413,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         // writing the file to disk is a big deal and kicks off fs watchers
         // so let's just double check that the file is actually different first
         const existingFile = await sys.readFile(filePath);
-        results.changedContent = (existingFile !== item.fileText);
+        if (isString(existingFile)) {
+          results.changedContent = (item.fileText.replace(/\r/g, '') !== existingFile.replace(/\r/g, ''));
+        }
+
         if (results.changedContent) {
           await ensureDir(filePath, false);
           await sys.writeFile(filePath, item.fileText);
