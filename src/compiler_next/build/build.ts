@@ -10,7 +10,6 @@ import ts from 'typescript';
 
 
 export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
-  console.trace('build');
   try {
     // empty the directories on the first build
     await emptyOutputTargets(config, compilerCtx, buildCtx);
