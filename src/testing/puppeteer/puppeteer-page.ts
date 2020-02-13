@@ -244,7 +244,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
         body: output.join('\n'),
       });
       // (page as any).removeAllListeners('request');
-      page.setRequestInterception(false);
+      // page.setRequestInterception(false);
       console.log('interceptedRequest2', pageUrl, Date.now())
 
     } else {
