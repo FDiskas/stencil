@@ -370,12 +370,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     item.isDirectory = false;
     item.queueDeleteFromDisk = false;
 
-    results.changedContent = (item.fileText !== content);
-
-    if (results.changedContent && isString(item.fileText)) {
-      // check again by trimming the ending since this may only be the
-      // difference of windows ending with CRLF and Unix ending in LF
-      results.changedContent = (item.fileText.trimRight() !== content.trimRight());
+    if (isString(item.fileText)) {
+      // compare strings but replace Windows CR to rule out any
+      // insignificant new line differences
+      results.changedContent = (item.fileText.replace(/\r/g, '') !== content.replace(/\r/g, ''));
     }
 
     results.queuedWrite = false;
