@@ -201,11 +201,9 @@ async function e2eGoTo(page: E2EPageInternal, url: string, options: puppeteer.Na
 
 
 async function e2eSetContent(page: E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
-  console.log('e2eSetContent 1', page.url(), Date.now())
   if (page.isClosed()) {
     throw new Error('e2eSetContent unavailable: page already closed');
   }
-  console.log('e2eSetContent 2', page.url(), Date.now())
   if (typeof html !== 'string') {
     throw new Error('invalid e2eSetContent() html');
   }
@@ -239,14 +237,15 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   await page.setRequestInterception(true);
   page.on('request', interceptedRequest => {
     if (pageUrl === interceptedRequest.url()) {
-      console.log('interceptedRequest', pageUrl, Date.now())
+      console.log('interceptedRequest1', pageUrl, Date.now())
       interceptedRequest.respond({
         status: 200,
         contentType: 'text/html',
         body: output.join('\n'),
       });
-      (page as any).removeAllListeners('request');
+      // (page as any).removeAllListeners('request');
       page.setRequestInterception(false);
+      console.log('interceptedRequest2', pageUrl, Date.now())
 
     } else {
       console.log('not interceptedRequest', pageUrl, interceptedRequest.url(), Date.now())
@@ -255,7 +254,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   });
 
   if (!options.waitUntil) {
-    options.waitUntil = env.__STENCIL_BROWSER_WAIT_UNTIL as any;
+    options.waitUntil = 'networkidle0';// env.__STENCIL_BROWSER_WAIT_UNTIL as any;
   }
   console.log('e2eSetContent 4', 'options.waitUntil', options.waitUntil, page.url(), Date.now())
   const rsp = await page._e2eGoto(pageUrl, options);
