@@ -1,10 +1,11 @@
 import * as d from '../../declarations';
-import { COMPONENTS_DTS_HEADER, indentTypes, sortImportNames } from './types-utils';
+import { COMPONENTS_DTS_HEADER, sortImportNames } from './types-utils';
 import { generateComponentTypes } from './generate-component-types';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { updateReferenceTypeImports } from './update-import-refs';
 import { normalizePath } from '@utils';
 import { updateStencilTypesImports } from './stencil-types';
+import ts from 'typescript';
 
 
 export const generateAppTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination: string) => {
@@ -53,47 +54,47 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
   });
 
   const jsxAugmentation = `
-declare module "@stencil/core" {
-  export namespace JSX {
-    interface IntrinsicElements {
-      ${modules.map(m => `'${m.tagName}': LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`).join('\n')}
+    declare module "@stencil/core" {
+      export namespace JSX {
+        interface IntrinsicElements {
+          ${modules.map(m => `'${m.tagName}': LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`).join('\n')}
+        }
+      }
     }
-  }
-}
-`;
+    `;
 
   const jsxElementGlobal = !needsJSXElementHack ? '' : `
-// Adding a global JSX for backcompatibility with legacy dependencies
-export namespace JSX {
-  export interface Element {}
-}
-`;
+    // Adding a global JSX for backcompatibility with legacy dependencies
+    export namespace JSX {
+      export interface Element {}
+    }
+    `;
 
   const componentsFileString = `
-export namespace Components {
-  ${modules.map(m => `${m.component}`).join('\n').trim()}
-}
+    export namespace Components {
+      ${modules.map(m => `${m.component}`).join('\n').trim()}
+    }
 
-declare global {
-  ${jsxElementGlobal}
-  ${modules.map(m => m.element).join('\n')}
-  interface HTMLElementTagNameMap {
-    ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
-  }
-}
+    declare global {
+      ${jsxElementGlobal}
+      ${modules.map(m => m.element).join('\n')}
+      interface HTMLElementTagNameMap {
+        ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
+      }
+    }
 
-declare namespace LocalJSX {
-  ${modules.map(m => `${m.jsx}`).join('\n').trim()}
+    declare namespace LocalJSX {
+      ${modules.map(m => `${m.jsx}`).join('\n').trim()}
 
-  interface IntrinsicElements {
-    ${modules.map(m => `'${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
-  }
-}
+      interface IntrinsicElements {
+        ${modules.map(m => `'${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
+      }
+    }
 
-export { LocalJSX as JSX };
+    export { LocalJSX as JSX };
 
-${jsxAugmentation}
-`;
+    ${jsxAugmentation}
+    `;
 
   const typeImportString = Object.keys(typeImportData).map(filePath => {
     const typeData = typeImportData[filePath];
@@ -107,7 +108,7 @@ ${jsxAugmentation}
     }
 
     return `import {
-${typeData.sort(sortImportNames).map(td => {
+      ${typeData.sort(sortImportNames).map(td => {
       if (td.localName === td.importName) {
         return `${td.importName},`;
       } else {
@@ -116,16 +117,21 @@ ${typeData.sort(sortImportNames).map(td => {
     })
         .join('\n')
       }
-} from '${importFilePath}';`;
+      } from '${importFilePath}';`;
 
   }).join('\n');
 
   const code = `
-import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-${typeImportString}
-${componentsFileString}
-`;
-  return `${COMPONENTS_DTS_HEADER}
+    ${COMPONENTS_DTS_HEADER}
+    import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
+    ${typeImportString}
+    ${componentsFileString}
+  `;
 
-${indentTypes(code)}`;
+  const tsSourceFile = ts.createSourceFile(GENERATED_DTS, code, ts.ScriptTarget.Latest, false);
+  const tsPrinter = ts.createPrinter({
+    newLine: ts.NewLineKind.LineFeed
+  });
+
+  return tsPrinter.printFile(tsSourceFile);
 };
