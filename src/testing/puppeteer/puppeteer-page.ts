@@ -201,10 +201,11 @@ async function e2eGoTo(page: E2EPageInternal, url: string, options: puppeteer.Na
 
 
 async function e2eSetContent(page: E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
+  console.log('e2eSetContent 1', page.url(), Date.now())
   if (page.isClosed()) {
     throw new Error('e2eSetContent unavailable: page already closed');
   }
-
+  console.log('e2eSetContent 2', page.url(), Date.now())
   if (typeof html !== 'string') {
     throw new Error('invalid e2eSetContent() html');
   }
@@ -226,9 +227,11 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
 
   const pageUrl = env.__STENCIL_BROWSER_URL__;
 
+  console.log('e2eSetContent 3', page.url(), Date.now())
   await page.setRequestInterception(true);
   page.on('request', interceptedRequest => {
     if (pageUrl === interceptedRequest.url()) {
+      console.log('interceptedRequest', pageUrl, Date.now())
       interceptedRequest.respond({
         status: 200,
         contentType: 'text/html',
@@ -238,6 +241,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
       page.setRequestInterception(false);
 
     } else {
+      console.log('not interceptedRequest', pageUrl, interceptedRequest.url(), Date.now())
       interceptedRequest.continue();
     }
   });
@@ -245,13 +249,17 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   if (!options.waitUntil) {
     options.waitUntil = env.__STENCIL_BROWSER_WAIT_UNTIL as any;
   }
+  console.log('e2eSetContent 4', 'options.waitUntil', options.waitUntil, page.url(), Date.now())
   const rsp = await page._e2eGoto(pageUrl, options);
+  console.log('e2eSetContent 5', page.url(), Date.now())
 
   if (!rsp.ok()) {
     throw new Error(`Testing unable to load content`);
   }
 
+  console.log('before waitForStencil', page.url(), Date.now())
   await waitForStencil(page);
+  console.log('before waitForStencil', Date.now())
 
   return rsp;
 }
