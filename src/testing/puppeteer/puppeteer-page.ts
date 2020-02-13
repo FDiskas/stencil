@@ -257,9 +257,9 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
     throw new Error(`Testing unable to load content`);
   }
 
-  console.log('before waitForStencil', page.url(), Date.now())
+  console.log('before waitForStencil', body.join('\n'), Date.now())
   await waitForStencil(page);
-  console.log('before waitForStencil', Date.now())
+  console.log('after waitForStencil', body.join('\n'), Date.now())
 
   return rsp;
 }
