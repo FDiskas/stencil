@@ -199,6 +199,7 @@ async function e2eGoTo(page: E2EPageInternal, url: string, options: puppeteer.Na
 
 
 async function e2eSetContent(page: E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
+  console.log('e2eSetContent', html)
   if (page.isClosed()) {
     throw new Error('e2eSetContent unavailable: page already closed');
   }
@@ -224,6 +225,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   console.log(body.join('\n'))
 
   const pageUrl = env.__STENCIL_BROWSER_URL__;
+  console.log('pageUrl', pageUrl)
 
   await page.setRequestInterception(true);
   page.on('request', interceptedRequest => {
@@ -244,13 +246,18 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   if (!options.waitUntil) {
     options.waitUntil = env.__STENCIL_BROWSER_WAIT_UNTIL as any;
   }
+  console.log(pageUrl, 1)
   const rsp = await page._e2eGoto(pageUrl, options);
+  console.log(pageUrl, 2)
 
   if (!rsp.ok()) {
+    console.log(pageUrl, 3)
     throw new Error(`Testing unable to load content`);
   }
 
+  console.log(pageUrl, 4)
   await waitForStencil(page);
+  console.log(pageUrl, 5)
 
   return rsp;
 }
