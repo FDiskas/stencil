@@ -221,6 +221,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   }
 
   body.push(html);
+  console.log(body.join('\n'))
 
   const pageUrl = env.__STENCIL_BROWSER_URL__;
 
