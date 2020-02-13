@@ -27,7 +27,7 @@ export const generateAppTypes = async (config: d.Config, compilerCtx: d.Compiler
 
   const componentsDtsRelFileName = config.sys.path.relative(config.rootDir, componentsDtsFilePath);
   if (changedContent) {
-    config.logger.debug(`${componentsDtsRelFileName} changed`);
+    config.logger.debug(`generateAppTypes: ${componentsDtsRelFileName} changed`);
   }
 
   timespan.finish(`generated app types finished: ${componentsDtsRelFileName}`);
@@ -61,7 +61,7 @@ declare module "@stencil/core" {
 }
 `;
 
-const jsxElementGlobal = !needsJSXElementHack ? '' : `
+  const jsxElementGlobal = !needsJSXElementHack ? '' : `
 // Adding a global JSX for backcompatibility with legacy dependencies
 export namespace JSX {
   export interface Element {}
@@ -107,14 +107,14 @@ ${jsxAugmentation}
 
     return `import {
 ${typeData.sort(sortImportNames).map(td => {
-  if (td.localName === td.importName) {
-    return `${td.importName},`;
-  } else {
-    return `${td.localName} as ${td.importName},`;
-  }
-})
-.join('\n')
-}
+      if (td.localName === td.importName) {
+        return `${td.importName},`;
+      } else {
+        return `${td.localName} as ${td.importName},`;
+      }
+    })
+        .join('\n')
+      }
 } from '${importFilePath}';`;
 
   }).join('\n');

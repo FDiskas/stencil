@@ -13,16 +13,17 @@ export const createTsBuildProgram = async (config: d.Config, buildCallback: (tsB
     ...ts.sys,
 
     watchFile(path, callback) {
+      console.log('watchFile', path);
       if (path.endsWith('/components.d.ts')) {
         return ts.sys.watchFile(path, callback);
       }
       return {
-        close() { return; }
+        close() { }
       };
     },
     watchDirectory() {
       return {
-        close() { return; }
+        close() { }
       };
     },
     setTimeout(callback, time) {
