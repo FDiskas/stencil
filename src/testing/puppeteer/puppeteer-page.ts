@@ -210,36 +210,28 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
     throw new Error('invalid e2eSetContent() html');
   }
 
-  const body: string[] = [];
+  const output: string[] = [];
 
   const appScriptUrl = env.__STENCIL_APP_SCRIPT_URL__;
   if (typeof appScriptUrl !== 'string') {
     throw new Error('invalid e2eSetContent() app script url');
   }
-  body.push(`<script>
 
-  window.onerror = function (msg, url, lineNo, columnNo, error) {
-    console.log('window onerror!', msg, url, lineNo, columnNo, error, document.body.outerHTML);
-    return false;
-  }
-
-  window.onabort = function() {
-    console.log('onabort', document.body.outerHTML);
-  }
-
-  window.addEventListener('load', function() {
-    console.log('window load', document.body.outerHTML);
-  });
-
-  </script>`);
-  body.push(`<script type="module" src="${appScriptUrl}"></script>`);
+  output.push(`<!doctype html>`);
+  output.push(`<html>`);
+  output.push(`<head>`);
 
   const appStyleUrl = env.__STENCIL_APP_STYLE_URL__;
   if (typeof appStyleUrl === 'string') {
-    body.push(`<link rel="stylesheet" href="${appStyleUrl}">`);
+    output.push(`<link rel="stylesheet" href="${appStyleUrl}">`);
   }
+  output.push(`<script type="module" src="${appScriptUrl}"></script>`);
 
-  body.push(html);
+  output.push(`</head>`);
+  output.push(`<body>`);
+  output.push(html);
+  output.push(`</body>`);
+  output.push(`</html>`);
 
   const pageUrl = env.__STENCIL_BROWSER_URL__;
 
@@ -251,7 +243,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
       interceptedRequest.respond({
         status: 200,
         contentType: 'text/html',
-        body: body.join('\n'),
+        body: output.join('\n'),
       });
       (page as any).removeAllListeners('request');
       page.setRequestInterception(false);
@@ -273,9 +265,9 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
     throw new Error(`Testing unable to load content`);
   }
 
-  console.log('before waitForStencil', body.join('\n'), Date.now())
+  console.log('before waitForStencil', output.join('\n'), Date.now())
   await waitForStencil(page);
-  console.log('after waitForStencil', body.join('\n'), Date.now())
+  console.log('after waitForStencil', output.join('\n'), Date.now())
 
   return rsp;
 }
