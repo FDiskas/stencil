@@ -221,7 +221,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
 
   const appStyleUrl = env.__STENCIL_APP_STYLE_URL__;
   if (typeof appStyleUrl === 'string') {
-    // output.push(`<link rel="stylesheet" href="${appStyleUrl}">`);
+    output.push(`<link rel="stylesheet" href="${appStyleUrl}">`);
   }
   output.push(`<script type="module" src="${appScriptUrl}"></script>`);
 
@@ -254,7 +254,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   });
 
   if (!options.waitUntil) {
-    options.waitUntil = 'networkidle0';// env.__STENCIL_BROWSER_WAIT_UNTIL as any;
+    options.waitUntil = env.__STENCIL_BROWSER_WAIT_UNTIL as any;
   }
   console.log('e2eSetContent 4', 'options.waitUntil', options.waitUntil, page.url(), Date.now())
   const rsp = await page._e2eGoto(pageUrl, options);
@@ -264,9 +264,9 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
     throw new Error(`Testing unable to load content`);
   }
 
-  console.log('before waitForStencil', output.join('\n'), Date.now())
+  console.log('before waitForStencil', Date.now())
   await waitForStencil(page);
-  console.log('after waitForStencil', output.join('\n'), Date.now())
+  console.log('after waitForStencil', Date.now())
 
   return rsp;
 }
