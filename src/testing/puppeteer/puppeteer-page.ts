@@ -221,7 +221,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
 
   const appStyleUrl = env.__STENCIL_APP_STYLE_URL__;
   if (typeof appStyleUrl === 'string') {
-    output.push(`<link rel="stylesheet" href="${appStyleUrl}">`);
+    // output.push(`<link rel="stylesheet" href="${appStyleUrl}">`);
   }
   output.push(`<script type="module" src="${appScriptUrl}"></script>`);
 
