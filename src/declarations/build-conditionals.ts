@@ -23,14 +23,15 @@ export interface BuildFeatures {
   vdomRender: boolean;
   noVdomRender: boolean;
   vdomAttribute: boolean;
-  vdomXlink: boolean;
   vdomClass: boolean;
-  vdomStyle: boolean;
-  vdomKey: boolean;
-  vdomRef: boolean;
-  vdomListener: boolean;
   vdomFunctional: boolean;
+  vdomKey: boolean;
+  vdomListener: boolean;
+  vdomRef: boolean;
+  vdomPropOrAttr: boolean;
+  vdomStyle: boolean;
   vdomText: boolean;
+  vdomXlink: boolean;
   slotRelocation: boolean;
 
   // elements
