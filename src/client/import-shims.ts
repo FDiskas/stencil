@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD, NAMESPACE } from '@build-conditionals';
 import { consoleDevInfo } from './client-log';
-import { CSS, H, doc, plt, win } from './client-window';
+import { CSS, H, doc, plt, promiseResolve, win } from './client-window';
 import { getDynamicImportFunction } from '@utils';
 
 
@@ -18,7 +18,7 @@ export const patchEsm = () => {
       }
     });
   }
-  return Promise.resolve();
+  return promiseResolve();
 };
 
 export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
@@ -76,7 +76,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
       return import(/* webpackChunkName: "stencil-polyfills-dom" */ './polyfills/dom.js').then(() => opts);
     }
   }
-  return Promise.resolve(opts);
+  return promiseResolve(opts);
 };
 
 export const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {

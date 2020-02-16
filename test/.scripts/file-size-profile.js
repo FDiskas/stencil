@@ -47,6 +47,7 @@ function getBuildFileSize(filePath) {
 
     const content = fs.readFileSync(filePath);
     let fileName = path.basename(filePath);
+    console.log('fileName', fileName);
 
     let brotliSize;
     let gzipSize;
@@ -54,6 +55,7 @@ function getBuildFileSize(filePath) {
 
     if (content.length > 0) {
       if (content.includes('SystemJS')) {
+        console.log(' - SystemJS', fileName);
         return null;
       }
 
@@ -66,6 +68,7 @@ function getBuildFileSize(filePath) {
     }
 
     if (minifiedSize === 0) {
+      console.log(' - minifiedSize 0', fileName);
       return null;
     }
 
@@ -85,6 +88,7 @@ function render(fileName, brotliSize, gzipSize, minifiedSize) {
   if (fileName.includes('-') && !fileName.includes('entry')) {
     const dotSplt = fileName.split('.');
     const dashSplt = dotSplt[0].split('-');
+    dashSplt[0] = dashSplt[0].replace('core', 'index');
     dashSplt[dashSplt.length - 1] = 'hash';
     fileName = dashSplt.join('-') + '.' + dotSplt[1];
   }

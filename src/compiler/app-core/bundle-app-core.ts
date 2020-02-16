@@ -144,7 +144,7 @@ export const getHydratedFlagHead = (h: d.HydratedFlag) => {
 
   const selector = h.selector === 'attribute' ?
     `[${h.name}]` :
-    `.${h.name}`
+    `.${h.name}`;
 
   if (!String(h.hydratedValue) || h.hydratedValue === '' || h.hydratedValue == null) {
     hydrated = '';
