@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const fileSizeProfile = require('./file-size-profile')
+const fileSizeProfile = require('./file-size-profile');
 
 const output = [
   `# Test Apps`,

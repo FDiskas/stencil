@@ -11,7 +11,6 @@ import { pluginHelper } from '../rollup-plugins/plugin-helper';
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
 import { stencilExternalRuntimePlugin } from '../rollup-plugins/stencil-external-runtime';
-import { HYDRATED_CSS } from '../../runtime/runtime-constants';
 
 
 export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleAppOptions: d.BundleAppOptions) => {
@@ -89,25 +88,10 @@ export const generateRollupOutput = async (build: RollupBuild, options: OutputOp
   return output
     .filter(chunk => !('isAsset' in chunk))
     .map((chunk: OutputChunk) => {
-      let code = chunk.code;
       const isCore = Object.keys(chunk.modules).includes('@stencil/core');
-      const hydratedFlag = config.hydratedFlag;
-      if (hydratedFlag) {
-        const hydratedFlagHead = getHydratedFlagHead(hydratedFlag);
-        if (HYDRATED_CSS !== hydratedFlagHead) {
-          code = code.replace(HYDRATED_CSS, hydratedFlagHead);
-          if (hydratedFlag.name !== 'hydrated') {
-            code = code.replace(`.classList.add("hydrated")`, `.classList.add("${hydratedFlag.name}")`);
-            code = code.replace(`.classList.add('hydrated')`, `.classList.add('${hydratedFlag.name}')`);
-            code = code.replace(`.setAttribute("hydrated",`, `.setAttribute("${hydratedFlag.name}",`);
-            code = code.replace(`.setAttribute('hydrated',`, `.setAttribute('${hydratedFlag.name}',`);
-          }
-        }
-      }
-
       return {
         fileName: chunk.fileName,
-        code: code,
+        code: chunk.code,
         moduleFormat: options.format,
         entryKey: chunk.name,
         imports: chunk.imports,
@@ -129,28 +113,3 @@ export { globals };
 export const DEFAULT_ENTRY = `
 export * from '@stencil/core';
 `;
-
-export const getHydratedFlagHead = (h: d.HydratedFlag) => {
-  // {visibility:hidden}.hydrated{visibility:inherit}
-
-  let initial: string;
-  let hydrated: string;
-
-  if (!String(h.initialValue) || h.initialValue === '' || h.initialValue == null) {
-    initial = '';
-  } else {
-    initial = `{${h.property}:${h.initialValue}}`;
-  }
-
-  const selector = h.selector === 'attribute' ?
-    `[${h.name}]` :
-    `.${h.name}`;
-
-  if (!String(h.hydratedValue) || h.hydratedValue === '' || h.hydratedValue == null) {
-    hydrated = '';
-  } else {
-    hydrated = `${selector}{${h.property}:${h.hydratedValue}}`;
-  }
-
-  return initial + hydrated;
-};
