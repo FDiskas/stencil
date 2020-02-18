@@ -36,6 +36,15 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
   }
   config.logger.level = config.logLevel;
 
+  config.extras = config.extras || {};
+  config.extras.appendChildSlotFix = !!config.extras.appendChildSlotFix;
+  config.extras.cloneNodeFix = !!config.extras.cloneNodeFix;
+  config.extras.cssVarsShim = config.extras.cssVarsShim !== false;
+  config.extras.dynamicImportShim = config.extras.dynamicImportShim !== false;
+  config.extras.lifecycleDOMEvents = !!config.extras.lifecycleDOMEvents;
+  config.extras.safari10 = config.extras.safari10 !== false;
+  config.extras.shadowDomShim = config.extras.shadowDomShim !== false;
+
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
 
